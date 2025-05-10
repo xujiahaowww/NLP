@@ -3,8 +3,6 @@ import torch.nn as nn
 import jieba
 
 
-# text = ['北京冬奥的进度条已经过半，不少外国运动员在完成自己的比赛后踏上归途。', '还有不少外国运动员在玩']
-# value = [' '.join(jieba.cut(i)) for i in text]
 def test01():
     text2 = '北京冬奥的进度条已经过半，不少外国运动员在完成自己的比赛后踏上归途。'
     value2 = jieba.lcut(text2)
@@ -23,19 +21,16 @@ def test01():
         print(i, word_embd)
 
 
+# 数据准备方法
 def data_P(text):
     text_value = [' '.join(jieba.lcut(i)) for i in text]
     arr = []
     for i in text_value:
         a = i.split()
         arr += a
-
     text_arr = list(set(arr))
-
     dic_word = {key: i for i, key in enumerate(text_arr)}
     dic_index = {i: key for i, key in enumerate(text_arr)}
-
-    #  text = ["i like dog", "i love coffee", "i hate milk", "i do nlp"]
     simple_arr = []
     target_arr = []
     for eee in text:
@@ -48,9 +43,9 @@ def data_P(text):
 
 
 # NNLM模型初次搭建
-class NNLModel(nn.Module):
+class NNLM_Model(nn.Module):
     def __init__(self, text_arr, tz_size):
-        super(NNLModel, self).__init__()
+        super(NNLM_Model, self).__init__()
         self.emb = nn.Embedding(num_embeddings=len(text_arr), embedding_dim=tz_size)
         self.fc1 = nn.Linear(in_features=2 * tz_size, out_features=8)
         self.fc2 = nn.Linear(in_features=8, out_features=len(text_arr))
@@ -65,18 +60,46 @@ class NNLModel(nn.Module):
 
 
 if __name__ == '__main__':
-    text = ["i like dog", "i love coffee", "i hate milk", "i do nlp"]
-
+    text_train = [
+        "she bakes cakes", "we watch movies", "they build forts", "he fixes bikes", "you drink tea",
+        "it spins fast", "dogs chase tails", "birds build nests", "fish hide well", "kids build sandcastles",
+        "sun sets late", "moon rises early", "stars fade slowly", "wind howls loud", "rain pours heavy",
+        "leaves turn brown", "grass grows green", "clouds drift lazily", "waves crash hard",
+        "volcanoes erupt violently",
+        "robots assemble cars", "computers process data", "phones ring loud", "radios play music",
+        "cameras capture moments",
+        "writers craft stories", "painters mix colors", "dancers spin gracefully", "actors memorize lines",
+        "singers hit notes",
+        "chefs chop veggies", "bakers knead dough", "farmers plant seeds", "doctors heal wounds",
+        "teachers grade papers",
+        "police catch thieves", "firefighters save lives", "soldiers defend borders", "pilots fly jets",
+        "sailors navigate seas",
+        "astronauts float weightlessly", "scientists test theories", "engineers design bridges",
+        "architects sketch plans", "programmers debug code",
+        "babies crawl slowly", "toddlers explore eagerly", "teens text constantly", "adults work hard",
+        "elders reminisce fondly"
+    ]
     # 数据准备
-    simple_arr, target_arr, text_arr, dic_word, dic_index = data_P(text)
+    # 训练集
+    simple_arr, target_arr, text_arr, dic_word, dic_index = data_P(text_train)
 
     simple_arr = torch.tensor(simple_arr)
     target_arr = torch.tensor(target_arr)
 
-    model = NNLModel(text_arr, tz_size=5)
+    # 测试集
+    text_test = ["she love cakes", "babies crawl slowly", "toddlers explore eagerly"]
+    text_test_arr = []
+    print('cakes' in dic_word)
+    for aaa in text_test:
+        a = [(dic_word[i] if i in dic_word else 10) for i in aaa.split()[:-1]]
+        text_test_arr.append(a)
+
+    text_test_arr = torch.tensor(text_test_arr)
+
+    model = NNLM_Model(text_arr, tz_size=5)
     lossFn = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    for epoch in range(400):
+    for epoch in range(3000):
         y_pred = model(simple_arr)
         loss = lossFn(y_pred, target_arr)
         loss.backward()
@@ -85,11 +108,12 @@ if __name__ == '__main__':
         if (epoch + 1) % 100 == 0:
             print('Epoch:', '%04d' % (epoch + 1), 'cost =', '{:.6f}'.format(loss))
 
-    _, predict = torch.max(model(simple_arr), 1)
+    # 测试
+    _, predict = torch.max(model(text_test_arr), 1)
     print(predict)
 
     predict = predict.numpy()
     predict = [dic_index[i] for i in list(predict)]
 
-    print(text)
+    print(text_test)
     print(predict)
