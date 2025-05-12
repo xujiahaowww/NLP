@@ -51,7 +51,9 @@ class NNLM_Model(nn.Module):
         self.fc2 = nn.Linear(in_features=8, out_features=len(text_arr))
 
     def forward(self, x):
+        print(x.shape)
         x = self.emb(x)  # [4,2,5]
+
         x = x.view(x.size(0), -1)  # [4,10]
         x = self.fc1(x)
         x = torch.tanh(x)
@@ -99,6 +101,7 @@ if __name__ == '__main__':
     model = NNLM_Model(text_arr, tz_size=5)
     lossFn = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    print(simple_arr.shape)
     for epoch in range(3000):
         y_pred = model(simple_arr)
         loss = lossFn(y_pred, target_arr)
