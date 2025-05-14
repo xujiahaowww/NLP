@@ -10,7 +10,7 @@ model.eval()
 save_dict = torch.load('LSTMmodel.pth')
 model.load_state_dict(save_dict)
 
-text_word = '垃圾'
+text_word = '服务挺不错'
 
 exp = r'[`,;!。，！]'
 text_word = re.sub(exp, '', text_word)

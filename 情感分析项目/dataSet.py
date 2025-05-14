@@ -15,8 +15,6 @@ def loadDataSet():
 
     mydict = {}
 
-    code_num = 0
-
     with open(text_path, mode='r', encoding='utf-8') as file:
         reader = csv.reader(file)
         # 得到词表字典
@@ -26,7 +24,7 @@ def loadDataSet():
         for row in reader:
             comment_id = row[0]
             comment_text = row[1]
-            comment_text = re.sub(exp, '', comment_text)
+            comment_text = re.sub(exp, '', comment_text)  # 去掉部分特殊符号
             comment_text = comment_text.replace(' ', '')  # 去空
             dict_list = [i for i in comment_text]
 
@@ -34,7 +32,7 @@ def loadDataSet():
             dict_list_all.append(dict_list)
             for word in comment_text:
                 target_list.append(word)
-        target_list = list(OrderedDict.fromkeys(target_list))
+        target_list = list(OrderedDict.fromkeys(target_list))  # 去重防止序列错位
         mydict = {key: v + 1 for v, key in enumerate(target_list)}
         # 填充字符的序号
         mydict["<pad>"] = 0
