@@ -5,9 +5,9 @@ from LSTMmodel import LSTMModel
 import torch.nn as nn
 from tqdm import tqdm
 
-train_loader, test_loader, dict_len = loadDataSet()
+train_loader, test_loader, dict_len, _, _ = loadDataSet()
 
-print('词表字典长度',dict_len)
+print('词表字典长度', dict_len)
 
 epochs = 10
 model = LSTMModel(dict_len, tz_Size=5, input_size=12, hidden_size=12, output_size=2)
@@ -17,11 +17,15 @@ optimizer = optim.Adam(model.parameters(), lr)
 lossFn = nn.CrossEntropyLoss()
 
 model.train()
+
+
 def adjust_learning_rate(optimizer, epoch, start_lr):
     # 每三个epoch衰减一次
     lr = start_lr * (0.1 ** (epoch // 3))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
+
+
 for epoch in range(epochs):
     lossALL = 0
     successAll = 0

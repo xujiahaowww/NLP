@@ -22,5 +22,5 @@ list_np = np.array(list)
 sentence_list = list_np.mean(axis=0)
 print(sentence_list)
 
-a = torch.randn(2, 3, 5)
+
 

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1" /> -->
+    <meta name="theme-color" content="#000000"/>
+    <meta name="description" content="Web site created using create-react-app"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--
+        manifest.json provides metadata used when your web app is installed on a
+        user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+      -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
+    <!--
+        Notice the use of %PUBLIC_URL% in the tags above.
+        It will be replaced with the URL of the `public` folder during the build.
+        Only files inside the `public` folder can be referenced from the HTML.
+
+        Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+        work correctly both with client-side routing and a non-root public URL.
+        Learn how to configure a non-root public URL by running `npm run build`.
+      -->
+    <title>React App</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+    <style>
+        #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 200px;
+        }
+    </style>
+    <script>
+        function callApi() {
+            let value = document.getElementById('aaa').value
+            console.log(value)
+            if (!value || value.trim() === '') {
+                window.alert('请输入！')
+                return
+            }
+            fetch('http://localhost:5003/api/word', {
+                method: 'POST', // 或者 'POST'
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 其他需要的头部信息
+                },
+                body: JSON.stringify({word: value})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let target = document.getElementById('root')
+                    target.innerHTML = data?.data
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+
+<body>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id='container'>
+    <h1 style="background-color: cornflowerblue;  font-size: large">情感分析</h1>
+    <textarea id="aaa" name="feedback"></textarea>
+    <button style="margin-top: 10px" onclick="callApi()">点击</button>
+    <div id="root"></div>
+</div>
+
+</body>
+</html>
